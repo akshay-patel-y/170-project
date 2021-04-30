@@ -24,42 +24,97 @@ def solve(G):
     k = []
     
     target = G.number_of_nodes() - 1
+    changed = True
     while c_budg > 0 or k_budg > 0:
+        if not changed:
+            break
+        changed = False
         sp = nx.shortest_path(G, source=0, target=target, "weight")
-        max_vitality = float('-inf')
-        max_node = 0 # what if sp = [0, target] (see checks below)
-        for node in sp:
-            if node != 0 and node != target:
-                v = vitality(G, node)
-                if v > max_vitality:
-                    max_node = node
-                    max_vitality = v
-        if c_budg > 0:
-            if len(sp) == 2: # sp = [0, target]
-                if k_budg > 0:
-                    G.remove_edge(0, target)
-                    k.append((0,target))
-                    # check that G isn't disconnected, if yes: ctrl+z
+        if len(sp) == 2:
+            if k_budg > 0:
+                G.remove_edge(0, target)
+                if not nx.is_connected(G):
+                    G.add_edge(0, target)
                 else:
-                    pass
-                    # do nothing
-            else:
-                G.remove_node(max_node)
-                c.append(max_node)
-                # check that G isn't disconnected, if yes: ctrl+z
-                c_budg -= 1
+                    k.append((0, target))
+                    changed = True
+                    k_budg -= 1
         else:
-            sp.index(max_node)
-            G.remove_edge() # remove one (smaller one) of two edges connected to max_node in sp
-            k.append()
-            # check that G isn't disconnected, if yes: ctrl+z
-            k_budg -= 1
+            vitalities = []
+            for i in range(len(sp[1:-1])):
+                vitalities.append((sp[i-1], sp[i], sp[i+1], vitality(G, x)))
+            vitalities.sort(key=lambda x: x[3], reverse=True)
+            for x in vitalities:
+                if c_budg > 0:
+                    G.remove_node(x[1])
+                    if not nx.is_connected(G):
+                        G.add_node(x[1])
+                    else:
+                        c.append(x[1])
+                        changed = True
+                        c_budg -= 1
+                        break
+                elif k_budg > 0:
+                    weight1 = G.edges[x[0], x[1]]['weight']
+                    weight2 = G.edges[x[1], x[2]]['weight']
+                    if weight1 < weight2:
+                        G.remove_edge(x[0], x[1])
+                        if not nx.is_connected(G):
+                            G.add_edge(x[0], x[1])
+                        else:
+                            k.append((x[0], x[1]))
+                            changed = True
+                            k_budg -= 1
+                            break
+                    else:
+                        G.remove_edge(x[1], x[2])
+                        if not nx.is_connected(G):
+                            G.add_edge(x[1], x[2])
+                        else:
+                            k.append((x[1], x[2]))
+                            changed = True
+                            k_budg -= 1
+                            break
+    return c, k
+
+            
+        # max_vitality = float('-inf')
+        # max_node = 0 # what if sp = [0, target] (see checks below)
+        # for node in sp:
+        #     if node != 0 and node != target:
+        #         v = vitality(G, node)
+        #         if v > max_vitality:
+        #             max_node = node
+        #             max_vitality = v
+        # if c_budg > 0:
+        #     if len(sp) == 2: # sp = [0, target]
+        #         if k_budg > 0:
+        #             G.remove_edge(0, target)
+                    
+        #             if not nx.is_connected(G):
+        #                 G.add_edge(0, target)
+
+        #             k.append((0,target))
+        #             # check that G isn't disconnected, if yes: ctrl+z
+        #         else:
+        #             pass
+        #             # do nothing
+        #     else:
+        #         G.remove_node(max_node)
+        #         c.append(max_node)
+        #         # check that G isn't disconnected, if yes: ctrl+z
+        #         c_budg -= 1
+        # else:
+        #     sp.index(max_node)
+        #     G.remove_edge() # remove one (smaller one) of two edges connected to max_node in sp
+        #     k.append()
+        #     # check that G isn't disconnected, if yes: ctrl+z
+        #     k_budg -= 1
             
 
     # until graph disconnected/c,k quota met:
     # find shortest path:
 
-    pass
 
 
 def maxVertex(G, shortestPath):
