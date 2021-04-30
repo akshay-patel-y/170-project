@@ -15,7 +15,9 @@ def solve(G):
         k: list of edges to remove
     """
     c_budg, k_budg = 1, 15
-    if len(G) <= 50:
+    if len(G) <= 30:
+        c_budg, k_budg = 1, 15
+    elif len(G) <= 50:
         c_budg, k_budg = 3, 50
     else:
         c_budg, k_budg = 5, 100
@@ -29,28 +31,30 @@ def solve(G):
         if not changed:
             break
         changed = False
-        sp = nx.shortest_path(G, source=0, target=target, "weight")
+        sp = nx.shortest_path(G, source=0, target=target, weight="weight")
         if len(sp) == 2:
             if k_budg > 0:
+                wt = G.edges[0, target]["weight"]
                 G.remove_edge(0, target)
                 if not nx.is_connected(G):
-                    G.add_edge(0, target)
+                    G.add_edge(0, target, weight=wt)
                 else:
                     k.append((0, target))
                     changed = True
                     k_budg -= 1
         else:
             vitalities = []
-            for i in range(len(sp[1:-1])):
-                vitalities.append((sp[i-1], sp[i], sp[i+1], vitality(G, x)))
+            for i in range(1, len(sp) - 1):
+                vitalities.append((sp[i-1], sp[i], sp[i+1], vitality(G, sp[i])))
             vitalities.sort(key=lambda x: x[3], reverse=True)
             for x in vitalities:
 
-
                 if c_budg > 0:
+                    H = G.copy()
                     G.remove_node(x[1])
                     if not nx.is_connected(G):
-                        G.add_node(x[1])
+                        G = H
+                        #G.add_node(x[1])
                        
                     else:
                         c.append(x[1])
@@ -64,7 +68,7 @@ def solve(G):
                     if weight1 < weight2:
                         G.remove_edge(x[0], x[1])
                         if not nx.is_connected(G):
-                            G.add_edge(x[0], x[1])
+                            G.add_edge(x[0], x[1], weight=weight1)
                         else:
                             k.append((x[0], x[1]))
                             changed = True
@@ -73,51 +77,13 @@ def solve(G):
                     else:
                         G.remove_edge(x[1], x[2])
                         if not nx.is_connected(G):
-                            G.add_edge(x[1], x[2])
+                            G.add_edge(x[1], x[2], weight=weight2)
                         else:
                             k.append((x[1], x[2]))
                             changed = True
                             k_budg -= 1
                             break
     return c, k
-
-            
-        # max_vitality = float('-inf')
-        # max_node = 0 # what if sp = [0, target] (see checks below)
-        # for node in sp:
-        #     if node != 0 and node != target:
-        #         v = vitality(G, node)
-        #         if v > max_vitality:
-        #             max_node = node
-        #             max_vitality = v
-        # if c_budg > 0:
-        #     if len(sp) == 2: # sp = [0, target]
-        #         if k_budg > 0:
-        #             G.remove_edge(0, target)
-                    
-        #             if not nx.is_connected(G):
-        #                 G.add_edge(0, target)
-
-        #             k.append((0,target))
-        #             # check that G isn't disconnected, if yes: ctrl+z
-        #         else:
-        #             pass
-        #             # do nothing
-        #     else:
-        #         G.remove_node(max_node)
-        #         c.append(max_node)
-        #         # check that G isn't disconnected, if yes: ctrl+z
-        #         c_budg -= 1
-        # else:
-        #     sp.index(max_node)
-        #     G.remove_edge() # remove one (smaller one) of two edges connected to max_node in sp
-        #     k.append()
-        #     # check that G isn't disconnected, if yes: ctrl+z
-        #     k_budg -= 1
-            
-
-    # until graph disconnected/c,k quota met:
-    # find shortest path:
 
 
 
@@ -158,23 +124,25 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-if __name__ == '__main__':
-    assert len(sys.argv) == 2
-    path = sys.argv[1]
-    G = read_input_file(path)
-    c, k = solve(G)
-    assert is_valid_solution(G, c, k)
-    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-    write_output_file(G, c, k, 'outputs/small-1.out')
+# if __name__ == '__main__':
+#     assert len(sys.argv) == 2
+#     path = sys.argv[1]
+#     G = read_input_file(path)
+#     H = G.copy()
+#     c, k = solve(H)
+
+#     assert is_valid_solution(G, c, k)
+#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+#     write_output_file(G, c, k, 'outputs/small-1.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
-# if __name__ == '__main__':
-#     inputs = glob.glob('inputs/*')
-#     for input_path in inputs:
-#         output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
-#         G = read_input_file(input_path)
-#         c, k = solve(G)
-#         assert is_valid_solution(G, c, k)
-#         distance = calculate_score(G, c, k)
-#         write_output_file(G, c, k, output_path)
+if __name__ == '__main__':
+    inputs = glob.glob('inputs/*')
+    for input_path in inputs:
+        output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
+        G = read_input_file(input_path)
+        c, k = solve(G)
+        assert is_valid_solution(G, c, k)
+        distance = calculate_score(G, c, k)
+        write_output_file(G, c, k, output_path)
