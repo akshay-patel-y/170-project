@@ -45,16 +45,20 @@ def solve(G):
                 vitalities.append((sp[i-1], sp[i], sp[i+1], vitality(G, x)))
             vitalities.sort(key=lambda x: x[3], reverse=True)
             for x in vitalities:
+
+
                 if c_budg > 0:
                     G.remove_node(x[1])
                     if not nx.is_connected(G):
                         G.add_node(x[1])
+                       
                     else:
                         c.append(x[1])
                         changed = True
                         c_budg -= 1
                         break
-                elif k_budg > 0:
+                
+                if k_budg > 0:
                     weight1 = G.edges[x[0], x[1]]['weight']
                     weight2 = G.edges[x[1], x[2]]['weight']
                     if weight1 < weight2:
@@ -145,7 +149,7 @@ def vitality(G, x):
     Returns:
         int, closeness vitality for x
     """
-    return closeness_vitality(G, node=x, weight="weight", wiener_index=None)
+    return nx.closeness_vitality(G, node=x, weight="weight", wiener_index=None)
         
         
     
@@ -154,14 +158,14 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-# if __name__ == '__main__':
-#     assert len(sys.argv) == 2
-#     path = sys.argv[1]
-#     G = read_input_file(path)
-#     c, k = solve(G)
-#     assert is_valid_solution(G, c, k)
-#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-#     write_output_file(G, c, k, 'outputs/small-1.out')
+if __name__ == '__main__':
+    assert len(sys.argv) == 2
+    path = sys.argv[1]
+    G = read_input_file(path)
+    c, k = solve(G)
+    assert is_valid_solution(G, c, k)
+    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+    write_output_file(G, c, k, 'outputs/small-1.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
