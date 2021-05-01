@@ -83,6 +83,9 @@ def solve(G):
                             changed = True
                             k_budg -= 1
                             break
+    # ideas:
+    # 1) edges first approach
+    # 2) somehow "looking ahead"??
     return c, k
 
 
@@ -138,11 +141,16 @@ def vitality(G, x):
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/*')
+    inputs = glob.glob('inputs/inputs/small/*')
+    distances = []
     for input_path in inputs:
-        output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
+        output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
-        c, k = solve(G)
+        H = G.copy()
+        c, k = solve(H)
         assert is_valid_solution(G, c, k)
-        distance = calculate_score(G, c, k)
+        distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
         write_output_file(G, c, k, output_path)
+    with open('outputs/distances_medium.txt', "w") as fo:
+        for d in distances:
+            fo.write(d[0] + " " + str(d[1]) + "\n")
