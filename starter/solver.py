@@ -104,6 +104,7 @@ def solve2(G):
     while c_budg > 0 or k_budg > 0:
         if not changed:
             break
+        changed = False
         k_sp = nx.shortest_simple_paths(G, source=0, target=target, weight='weight')
         sp = next(k_sp)
         paths = []
@@ -113,6 +114,13 @@ def solve2(G):
         common_nodes.remove(0)
         common_nodes.remove(target)
         i = 0
+        k_disjoint = c_disjoint = 0
+        edgeFreqs = {}
+        nodeFreqs = {}
+        for node in common_nodes:
+            nodeFreqs[node] = 1
+        for edge in common_edges:
+            edgeFreqs[edge] = 1
         for path in k_sp:
             paths.append(path)
             path_graph = nx.path_graph(path)
@@ -120,17 +128,40 @@ def solve2(G):
             nodes_to_add = set(path)
             edge_inter = edges_to_add.intersection(common_edges)
             node_inter = nodes_to_add.intersection(common_nodes)
-            if len(edge_inter) == 0 or len(node_inter) == 0 or i >= limit:
+            if len(edge_inter) == 0:
+                k_disjoint += 1
+            if len(node_inter) == 0:
+                c_disjoint += 1
+            if k_disjoint > k_budg or c_disjoint > c_budg or i >= limit:
                 break
-            common_edges = edge_inter
-            common_nodes = node_inter
+            for edge in edge_inter:
+                if edge in edgeFreqs:
+                    edgeFreqs[edge] += 1
+                elif edge[::-1] in edgeFreqs:
+                    edgeFreqs[edge] += 1
+                else:
+                    edgeFreqs[edge] = 1
+            for node in node_inter:
+                if node in nodeFreqs:
+                    nodeFreqs[node] += 1
+                else:
+                    nodeFreqs[node] = 1
+            # if len(edge_inter) == 0 or len(node_inter) == 0 or i >= limit:
+            #     break
+            #common_edges = edge_inter
+            #common_nodes = node_inter
             i += 1
         if k_budg > 0:
-            edge_weights = list(common_edges)
-            edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
-            for edge in edge_weights:
+            edges = list(edgeFreqs.keys())
+            edges.sort(key=lambda x: edgeFreqs[x], reverse=True)
+            #edge_weights = list(common_edges)
+            #edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
+            j = 0
+            while not changed and j < len(edges):
+                edge = edges[j]
                 weight = G.edges[edge[0], edge[1]]['weight']
                 G.remove_edge(edge[0], edge[1])
+                j += 1
                 if not nx.is_connected(G):
                     G.add_edge(edge[0], edge[1], weight=weight)
                 else:
@@ -138,16 +169,25 @@ def solve2(G):
                     changed = True
                     k_budg -= 1
                     break
-        elif c_budg > 0:
-            node_degrees = list(G.degree(list(common_nodes)))
-            node_degrees.sort(key=lambda x: x[1], reverse=True)
-            for node in node_degrees:
+        elif c_budg > 0 or not changed:
+            nodes = list(nodeFreqs.keys())
+            nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
+            # node_degrees = list(G.degree(list(common_nodes)))
+            # node_degrees.sort(key=lambda x: x[1], reverse=True)
+            j = 0
+            while not changed and j < len(nodes):
                 H = G.copy()
-                G.remove_node(node[0])
+                node = nodes[j]
+                G.remove_node(node)
+                j += 1
                 if not nx.is_connected(G):
                     G = H
                 else:
-                    c.append(node[0])
+                    for edge in k:
+                        if edge[0] == node or edge[1] == node:
+                            k.remove(edge)
+                            k_budg += 1
+                    c.append(node)
                     changed = True
                     c_budg -= 1
                     break
@@ -210,30 +250,34 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-if __name__ == '__main__':
-    assert len(sys.argv) == 2
-    path = sys.argv[1]
-    G = read_input_file(path)
-    H = G.copy()
-    c, k = solve2(H)
+# if __name__ == '__main__':
+#     assert len(sys.argv) == 2
+#     path = sys.argv[1]
+#     G = read_input_file(path)
+#     H = G.copy()
+#     c, k = solve2(H)
 
-    assert is_valid_solution(G, c, k)
-    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-    write_output_file(G, c, k, 'outputs/test.out')
+#     assert is_valid_solution(G, c, k)
+#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+#     write_output_file(G, c, k, 'outputs/test.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
-# if __name__ == '__main__':
-#     inputs = glob.glob('inputs/inputs/large/*')
-#     distances = []
-#     for input_path in inputs:
-#         output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
-#         G = read_input_file(input_path)
-#         H = G.copy()
-#         c, k = solve(H)
-#         assert is_valid_solution(G, c, k)
-#         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
-#         write_output_file(G, c, k, output_path)
-#     with open('outputs/distances_large.txt', "w") as fo:
-#         for d in distances:
-#             fo.write(d[0] + " " + str(d[1]) + "\n")
+# Brandon: 1-100
+# Instructional machine: 101-200
+# Akshay: 201-250
+# Cindy: 251-300
+if __name__ == '__main__':
+    inputs = glob.glob('inputs/inputs/large/*')
+    distances = []
+    for input_path in inputs:
+        output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
+        G = read_input_file(input_path)
+        H = G.copy()
+        c, k = solve(H)
+        assert is_valid_solution(G, c, k)
+        distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
+        write_output_file(G, c, k, output_path)
+    with open('outputs/distances_large.txt', "w") as fo:
+        for d in distances:
+            fo.write(d[0] + " " + str(d[1]) + "\n")
