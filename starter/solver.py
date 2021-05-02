@@ -88,6 +88,89 @@ def solve(G):
     # 2) somehow "looking ahead"??
     return c, k
 
+def solve2(G):
+    if len(G) <= 30:
+        c_budg, k_budg = 1, 15
+    elif len(G) <= 50:
+        c_budg, k_budg = 3, 50
+    else:
+        c_budg, k_budg = 5, 100
+
+    c = []
+    k = []
+    limit = 50
+    target = G.number_of_nodes() - 1
+    changed = True
+    while c_budg > 0 or k_budg > 0:
+        if not changed:
+            break
+        k_sp = nx.shortest_simple_paths(G, source=0, target=target, weight='weight')
+        sp = next(k_sp)
+        paths = []
+        path_graph = nx.path_graph(sp)
+        common_edges = set(path_graph.edges())
+        common_nodes = set(sp)
+        common_nodes.remove(0)
+        common_nodes.remove(target)
+        i = 0
+        for path in k_sp:
+            paths.append(path)
+            path_graph = nx.path_graph(path)
+            edges_to_add = set(path_graph.edges())
+            nodes_to_add = set(path)
+            edge_inter = edges_to_add.intersection(common_edges)
+            node_inter = nodes_to_add.intersection(common_nodes)
+            if len(edge_inter) == 0 or len(node_inter) == 0 or i >= limit:
+                break
+            common_edges = edge_inter
+            common_nodes = node_inter
+            i += 1
+        if k_budg > 0:
+            edge_weights = list(common_edges)
+            edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
+            for edge in edge_weights:
+                weight = G.edges[edge[0], edge[1]]['weight']
+                G.remove_edge(edge[0], edge[1])
+                if not nx.is_connected(G):
+                    G.add_edge(edge[0], edge[1], weight=weight)
+                else:
+                    k.append((edge[0], edge[1]))
+                    changed = True
+                    k_budg -= 1
+                    break
+        elif c_budg > 0:
+            node_degrees = list(G.degree(list(common_nodes)))
+            node_degrees.sort(key=lambda x: x[1], reverse=True)
+            for node in node_degrees:
+                H = G.copy()
+                G.remove_node(node[0])
+                if not nx.is_connected(G):
+                    G = H
+                else:
+                    c.append(node[0])
+                    changed = True
+                    c_budg -= 1
+                    break
+        # elif k_budg > 0:
+        #     edge_weights = list(common_edges)
+        #     edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
+        #     for edge in edge_weights:
+        #         weight = G.edges[edge[0], edge[1]]['weight']
+        #         G.remove_edge(edge[0], edge[1])
+        #         if not nx.is_connected(G):
+        #             G.add_edge(edge[0], edge[1], weight=weight)
+        #         else:
+        #             k.append((edge[0], edge[1]))
+        #             changed = True
+        #             k_budg -= 1
+        #             break
+    return c, k
+
+        
+        
+            
+
+
 
 
 def maxVertex(G, shortestPath):
@@ -127,30 +210,30 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-# if __name__ == '__main__':
-#     assert len(sys.argv) == 2
-#     path = sys.argv[1]
-#     G = read_input_file(path)
-#     H = G.copy()
-#     c, k = solve(H)
+if __name__ == '__main__':
+    assert len(sys.argv) == 2
+    path = sys.argv[1]
+    G = read_input_file(path)
+    H = G.copy()
+    c, k = solve2(H)
 
-#     assert is_valid_solution(G, c, k)
-#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-#     write_output_file(G, c, k, 'outputs/small-1.out')
+    assert is_valid_solution(G, c, k)
+    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+    write_output_file(G, c, k, 'outputs/test.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
-if __name__ == '__main__':
-    inputs = glob.glob('inputs/inputs/medium/*')
-    distances = []
-    for input_path in inputs:
-        output_path = 'outputs/medium/' + basename(normpath(input_path))[:-3] + '.out'
-        G = read_input_file(input_path)
-        H = G.copy()
-        c, k = solve(H)
-        assert is_valid_solution(G, c, k)
-        distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
-        write_output_file(G, c, k, output_path)
-    with open('outputs/distances_medium.txt', "w") as fo:
-        for d in distances:
-            fo.write(d[0] + " " + str(d[1]) + "\n")
+# if __name__ == '__main__':
+#     inputs = glob.glob('inputs/inputs/large/*')
+#     distances = []
+#     for input_path in inputs:
+#         output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
+#         G = read_input_file(input_path)
+#         H = G.copy()
+#         c, k = solve(H)
+#         assert is_valid_solution(G, c, k)
+#         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
+#         write_output_file(G, c, k, output_path)
+#     with open('outputs/distances_large.txt', "w") as fo:
+#         for d in distances:
+#             fo.write(d[0] + " " + str(d[1]) + "\n")
