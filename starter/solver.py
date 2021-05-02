@@ -274,7 +274,7 @@ if __name__ == '__main__':
         output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
         H = G.copy()
-        c, k = solve(H)
+        c, k = solve2(H)
         assert is_valid_solution(G, c, k)
         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
         write_output_file(G, c, k, output_path)
