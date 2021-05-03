@@ -169,7 +169,7 @@ def solve2(G):
                     changed = True
                     k_budg -= 1
                     break
-        elif c_budg > 0 or not changed:
+        elif c_budg > 0 and not changed:
             nodes = list(nodeFreqs.keys())
             nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
             # node_degrees = list(G.degree(list(common_nodes)))
@@ -268,16 +268,16 @@ def vitality(G, x):
 # Akshay: 201-250
 # Cindy: 251-300
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/inputs/large/*')
+    inputs = glob.glob('inputs/inputs/temp/*')
     distances = []
     for input_path in inputs:
-        output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
+        output_path = 'outputs/brandon_outputs/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
         H = G.copy()
         c, k = solve2(H)
         assert is_valid_solution(G, c, k)
         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
         write_output_file(G, c, k, output_path)
-    with open('outputs/distances_large.txt', "w") as fo:
+    with open('outputs/brandon_outputs/distances_large_50-151_161.txt', "w") as fo:
         for d in distances:
             fo.write(d[0] + " " + str(d[1]) + "\n")
