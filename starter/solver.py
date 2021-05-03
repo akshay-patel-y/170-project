@@ -259,7 +259,7 @@ def vitality(G, x):
 
 #     assert is_valid_solution(G, c, k)
 #     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-#     write_output_file(G, c, k, 'outputs/test.out')
+#     write_output_file(G, c, k, 'outputs/l251-300/large-238.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
@@ -268,10 +268,10 @@ def vitality(G, x):
 # Akshay: 201-250
 # Cindy: 251-300
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/inputs/large/*')
+    inputs = glob.glob('inputs/inputs/l251-300/*')
     distances = []
     for input_path in inputs:
-        output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
+        output_path = 'outputs/l251-300/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
         H = G.copy()
         c, k = solve2(H)
