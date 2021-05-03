@@ -99,6 +99,7 @@ def solve2(G):
     c = []
     k = []
     limit = 50
+    # limit = k_budg
     target = G.number_of_nodes() - 1
     changed = True
     while c_budg > 0 or k_budg > 0:
@@ -169,7 +170,7 @@ def solve2(G):
                     changed = True
                     k_budg -= 1
                     break
-        elif c_budg > 0 and not changed:
+        elif c_budg > 0 and not changed: #or not changed:
             nodes = list(nodeFreqs.keys())
             nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
             # node_degrees = list(G.degree(list(common_nodes)))
@@ -187,6 +188,10 @@ def solve2(G):
                         if edge[0] == node or edge[1] == node:
                             k.remove(edge)
                             k_budg += 1
+                    # for edge in k:
+                    #     if edge[0] == node or edge[1] == node:
+                    #         k.remove(edge)
+                    #         k_budg += 1
                     c.append(node)
                     changed = True
                     c_budg -= 1
@@ -204,14 +209,30 @@ def solve2(G):
         #             changed = True
         #             k_budg -= 1
         #             break
+    # for large-101
+    # for node in c:
+    #     for edge in k:
+    #         if edge[0] == node or edge[1] == node:
+    #             k.remove(edge)
+    #             sp = nx.shortest_path(G, source=0, target=target, weight="weight")
+    #             path_graph = nx.path_graph(sp)
+    #             vitalities = []
+    #             for i in range(1, len(sp) - 1):
+    #                 vitalities.append((sp[i-1], sp[i], sp[i+1], vitality(G, sp[i])))
+    #             vitalities.sort(key=lambda x: x[3], reverse=True)
+    #             for x in vitalities:
+    #                 weight1 = G.edges[x[0], x[1]]['weight']
+    #                 weight2 = G.edges[x[1], x[2]]['weight']
+    #                 if weight1 < weight2:
+    #                     G.remove_edge(x[0], x[1])
+    #                     if not nx.is_connected(G):
+    #                         G.add_edge(x[0], x[1], weight=weight1)
+    #                     else:
+    #                         k.append((x[0], x[1]))
+    #                         changed = True
+    #                         k_budg -= 1
+    #                         break
     return c, k
-
-        
-        
-            
-
-
-
 
 def maxVertex(G, shortestPath):
     """
@@ -242,24 +263,21 @@ def vitality(G, x):
         int, closeness vitality for x
     """
     return nx.closeness_vitality(G, node=x, weight="weight", wiener_index=None)
-        
-        
-    
 
 # Here's an example of how to run your solver.
 
 # Usage: python3 solver.py test.in
 
-# if __name__ == '__main__':
-#     assert len(sys.argv) == 2
-#     path = sys.argv[1]
-#     G = read_input_file(path)
-#     H = G.copy()
-#     c, k = solve2(H)
+if __name__ == '__main__':
+    assert len(sys.argv) == 2
+    path = sys.argv[1]
+    G = read_input_file(path)
+    H = G.copy()
+    c, k = solve2(H)
 
-#     assert is_valid_solution(G, c, k)
-#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-#     write_output_file(G, c, k, 'outputs/test.out')
+    assert is_valid_solution(G, c, k)
+    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+    write_output_file(G, c, k, 'outputs/l151-200/large-101.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
@@ -267,17 +285,17 @@ def vitality(G, x):
 # Instructional machine: 101-200
 # Akshay: 201-250
 # Cindy: 251-300
-if __name__ == '__main__':
-    inputs = glob.glob('inputs/inputs/temp/*')
-    distances = []
-    for input_path in inputs:
-        output_path = 'outputs/brandon_outputs/' + basename(normpath(input_path))[:-3] + '.out'
-        G = read_input_file(input_path)
-        H = G.copy()
-        c, k = solve2(H)
-        assert is_valid_solution(G, c, k)
-        distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
-        write_output_file(G, c, k, output_path)
-    with open('outputs/brandon_outputs/distances_large_50-151_161.txt', "w") as fo:
-        for d in distances:
-            fo.write(d[0] + " " + str(d[1]) + "\n")
+# if __name__ == '__main__':
+#     inputs = glob.glob('inputs/inputs/l151-200/*')
+#     distances = []
+#     for input_path in inputs:
+#         output_path = 'outputs/l151-200/' + basename(normpath(input_path))[:-3] + '.out'
+#         G = read_input_file(input_path)
+#         H = G.copy()
+#         c, k = solve2(H)
+#         assert is_valid_solution(G, c, k)
+#         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
+#         write_output_file(G, c, k, output_path)
+#     with open('outputs/distances_large.txt', "w") as fo:
+#         for d in distances:
+#             fo.write(d[0] + " " + str(d[1]) + "\n")
