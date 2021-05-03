@@ -169,7 +169,7 @@ def solve2(G):
                     changed = True
                     k_budg -= 1
                     break
-        elif c_budg > 0 or not changed:
+        elif c_budg > 0 and not changed:
             nodes = list(nodeFreqs.keys())
             nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
             # node_degrees = list(G.degree(list(common_nodes)))
