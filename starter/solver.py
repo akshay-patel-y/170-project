@@ -210,28 +210,28 @@ def solve2(G):
         #             k_budg -= 1
         #             break
     # for large-101
-    # for node in c:
-    #     for edge in k:
-    #         if edge[0] == node or edge[1] == node:
-    #             k.remove(edge)
-    #             sp = nx.shortest_path(G, source=0, target=target, weight="weight")
-    #             path_graph = nx.path_graph(sp)
-    #             vitalities = []
-    #             for i in range(1, len(sp) - 1):
-    #                 vitalities.append((sp[i-1], sp[i], sp[i+1], vitality(G, sp[i])))
-    #             vitalities.sort(key=lambda x: x[3], reverse=True)
-    #             for x in vitalities:
-    #                 weight1 = G.edges[x[0], x[1]]['weight']
-    #                 weight2 = G.edges[x[1], x[2]]['weight']
-    #                 if weight1 < weight2:
-    #                     G.remove_edge(x[0], x[1])
-    #                     if not nx.is_connected(G):
-    #                         G.add_edge(x[0], x[1], weight=weight1)
-    #                     else:
-    #                         k.append((x[0], x[1]))
-    #                         changed = True
-    #                         k_budg -= 1
-    #                         break
+    for node in c:
+        for edge in k:
+            if edge[0] == node or edge[1] == node:
+                k.remove(edge)
+                sp = nx.shortest_path(G, source=0, target=target, weight="weight")
+                path_graph = nx.path_graph(sp)
+                vitalities = []
+                for i in range(1, len(sp) - 1):
+                    vitalities.append((sp[i-1], sp[i], sp[i+1], vitality(G, sp[i])))
+                vitalities.sort(key=lambda x: x[3], reverse=True)
+                for x in vitalities:
+                    weight1 = G.edges[x[0], x[1]]['weight']
+                    weight2 = G.edges[x[1], x[2]]['weight']
+                    if weight1 < weight2:
+                        G.remove_edge(x[0], x[1])
+                        if not nx.is_connected(G):
+                            G.add_edge(x[0], x[1], weight=weight1)
+                        else:
+                            k.append((x[0], x[1]))
+                            changed = True
+                            k_budg -= 1
+                            break
     return c, k
 
 def maxVertex(G, shortestPath):
@@ -268,16 +268,15 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-if __name__ == '__main__':
-    assert len(sys.argv) == 2
-    path = sys.argv[1]
-    G = read_input_file(path)
-    H = G.copy()
-    c, k = solve2(H)
-
-    assert is_valid_solution(G, c, k)
-    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-    write_output_file(G, c, k, 'outputs/l151-200/test.out')
+# if __name__ == '__main__':
+#     assert len(sys.argv) == 2
+#     path = sys.argv[1]
+#     G = read_input_file(path)
+#     H = G.copy()
+#     c, k = solve2(H)
+#     assert is_valid_solution(G, c, k)
+#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+#     write_output_file(G, c, k, 'outputs/l151-200/large-101.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
@@ -285,17 +284,17 @@ if __name__ == '__main__':
 # Instructional machine: 101-200
 # Akshay: 201-250
 # Cindy: 251-300
-# if __name__ == '__main__':
-#     inputs = glob.glob('inputs/inputs/l151-200/*')
-#     distances = []
-#     for input_path in inputs:
-#         output_path = 'outputs/l151-200/' + basename(normpath(input_path))[:-3] + '.out'
-#         G = read_input_file(input_path)
-#         H = G.copy()
-#         c, k = solve2(H)
-#         assert is_valid_solution(G, c, k)
-#         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
-#         write_output_file(G, c, k, output_path)
-#     with open('outputs/distances_large.txt', "w") as fo:
-#         for d in distances:
-#             fo.write(d[0] + " " + str(d[1]) + "\n")
+if __name__ == '__main__':
+    inputs = glob.glob('inputs/inputs/medium/*')
+    distances = []
+    for input_path in inputs:
+        output_path = 'outputs/medium/' + basename(normpath(input_path))[:-3] + '.out'
+        G = read_input_file(input_path)
+        H = G.copy()
+        c, k = solve2(H)
+        assert is_valid_solution(G, c, k)
+        distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
+        write_output_file(G, c, k, output_path)
+    with open('outputs/distances_medium_alg2.txt', "w") as fo:
+        for d in distances:
+            fo.write(d[0] + " " + str(d[1]) + "\n")
