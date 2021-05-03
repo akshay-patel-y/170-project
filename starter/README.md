@@ -20,3 +20,12 @@ When writing inputs/outputs:
 - Make sure you use the functions `write_input_file` and `write_output_file` provided
 - Run the functions `read_input_file` and `read_output_file` to validate your files before submitting!
   - These are the functions run by the autograder to validate submissions
+
+
+To Run the code:
+- CD into the starter directory
+- Uncomment lines 293 - 307
+- Depending on which size of inputs you want to run, replce the word "temp" in line 294 with "small", "medium", or "large"
+- use the command python3 solve.py
+- if you want to run individual files uncomment lines 277 - 285
+- Use the command python3 solver.py inputs/inputs/{desidered size of graph}/{graph name}
