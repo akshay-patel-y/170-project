@@ -24,7 +24,7 @@ When writing inputs/outputs:
 
 To Run the code:
 - CD into the starter directory
-- Uncomment lines 293 - 307
+- If you want to run folders at a time Uncomment lines 293 - 307
 - Depending on which size of inputs you want to run, replce the word "temp" in line 294 with "small", "medium", or "large"
 - use the command python3 solve.py
 - if you want to run individual files uncomment lines 277 - 285
