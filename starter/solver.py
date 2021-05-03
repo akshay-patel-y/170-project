@@ -13,6 +13,7 @@ def solve(G):
     Returns:
         c: list of cities to remove
         k: list of edges to remove
+    Vitality, node-first approach
     """
     c_budg, k_budg = 1, 15
     if len(G) <= 30:
@@ -89,6 +90,14 @@ def solve(G):
     return c, k
 
 def solve2(G):
+    """
+    Args:
+        G: networkx.Graph
+    Returns:
+        c: list of cities to remove
+        k: list of edges to remove
+    Edge-first, frequency in relation to lightest edge in shortest path approach
+    """
     if len(G) <= 30:
         c_budg, k_budg = 1, 15
     elif len(G) <= 50:
@@ -98,8 +107,8 @@ def solve2(G):
 
     c = []
     k = []
-    limit = 50
-    # limit = k_budg
+    # limit = 50
+    limit = k_budg
     target = G.number_of_nodes() - 1
     changed = True
     while c_budg > 0 or k_budg > 0:
@@ -133,7 +142,7 @@ def solve2(G):
                 k_disjoint += 1
             if len(node_inter) == 0:
                 c_disjoint += 1
-            if k_disjoint > k_budg and k_bug > 0:
+            if k_disjoint > k_budg and k_budg > 0:
                 break
             if c_disjoint > c_budg and c_disjoint > 0:
                 break
@@ -176,7 +185,7 @@ def solve2(G):
                     changed = True
                     k_budg -= 1
                     break
-        elif c_budg > 0 and not changed: #or not changed:
+        elif c_budg > 0 and not changed:
             nodes = list(nodeFreqs.keys())
             nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
             # node_degrees = list(G.degree(list(common_nodes)))
@@ -194,10 +203,6 @@ def solve2(G):
                         if edge[0] == node or edge[1] == node:
                             k.remove(edge)
                             k_budg += 1
-                    # for edge in k:
-                    #     if edge[0] == node or edge[1] == node:
-                    #         k.remove(edge)
-                    #         k_budg += 1
                     c.append(node)
                     changed = True
                     c_budg -= 1
@@ -215,7 +220,7 @@ def solve2(G):
         #             changed = True
         #             k_budg -= 1
         #             break
-    # for large-101
+    # for large-101 edge case
     for node in c:
         for edge in k:
             if edge[0] == node or edge[1] == node:
@@ -274,15 +279,15 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-# if __name__ == '__main__':
-#     assert len(sys.argv) == 2
-#     path = sys.argv[1]
-#     G = read_input_file(path)
-#     H = G.copy()
-#     c, k = solve2(H)
-#     assert is_valid_solution(G, c, k)
-#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-#     write_output_file(G, c, k, 'outputs/l151-200/large-101.out')
+if __name__ == '__main__':
+    assert len(sys.argv) == 2
+    path = sys.argv[1]
+    G = read_input_file(path)
+    H = G.copy()
+    c, k = solve2(H)
+    assert is_valid_solution(G, c, k)
+    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+    write_output_file(G, c, k, 'outputs/test.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
