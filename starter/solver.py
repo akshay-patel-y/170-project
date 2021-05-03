@@ -133,8 +133,14 @@ def solve2(G):
                 k_disjoint += 1
             if len(node_inter) == 0:
                 c_disjoint += 1
-            if k_disjoint > k_budg or c_disjoint > c_budg or i >= limit:
+            if k_disjoint > k_budg and k_bug > 0:
                 break
+            if c_disjoint > c_budg and c_disjoint > 0:
+                break
+            if i >= limit:
+                break
+            # if k_disjoint > k_budg or c_disjoint > c_budg or i >= limit:
+            #     break
             for edge in edge_inter:
                 if edge in edgeFreqs:
                     edgeFreqs[edge] += 1
@@ -268,16 +274,16 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-# if __name__ == '__main__':
-#     assert len(sys.argv) == 2
-#     path = sys.argv[1]
-#     G = read_input_file(path)
-#     H = G.copy()
-#     c, k = solve2(H)
+if __name__ == '__main__':
+    assert len(sys.argv) == 2
+    path = sys.argv[1]
+    G = read_input_file(path)
+    H = G.copy()
+    c, k = solve2(H)
 
-#     assert is_valid_solution(G, c, k)
-#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-#     write_output_file(G, c, k, 'outputs/l151-200/large-101.out')
+    assert is_valid_solution(G, c, k)
+    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+    write_output_file(G, c, k, 'outputs/large-161.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
@@ -285,17 +291,17 @@ def vitality(G, x):
 # Instructional machine: 101-200
 # Akshay: 201-250
 # Cindy: 251-300
-if __name__ == '__main__':
-    inputs = glob.glob('inputs/inputs/medium/*')
-    distances = []
-    for input_path in inputs:
-        output_path = 'outputs/medium/' + basename(normpath(input_path))[:-3] + '.out'
-        G = read_input_file(input_path)
-        H = G.copy()
-        c, k = solve2(H)
-        assert is_valid_solution(G, c, k)
-        distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
-        write_output_file(G, c, k, output_path)
-    with open('outputs/distances_medium_alg2.txt', "w") as fo:
-        for d in distances:
-            fo.write(d[0] + " " + str(d[1]) + "\n")
+# if __name__ == '__main__':
+#     inputs = glob.glob('inputs/inputs/temp/*')
+#     distances = []
+#     for input_path in inputs:
+#         output_path = 'outputs/L1-150/' + basename(normpath(input_path))[:-3] + '.out'
+#         G = read_input_file(input_path)
+#         H = G.copy()
+#         c, k = solve2(H)
+#         assert is_valid_solution(G, c, k)
+#         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
+#         write_output_file(G, c, k, output_path)
+    # with open('outputs/distances_medium_alg2.txt', "w") as fo:
+    #     for d in distances:
+    #         fo.write(d[0] + " " + str(d[1]) + "\n")
