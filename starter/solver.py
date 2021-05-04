@@ -308,10 +308,10 @@ def vitality(G, x):
 # Akshay: 201-250
 # Cindy: 251-300
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/inputs/temp/*')
+    inputs = glob.glob('inputs/inputs/large/*')
     distances = []
     for input_path in inputs:
-        output_path = 'outputs/large_3/' + basename(normpath(input_path))[:-3] + '.out'
+        output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
         H = G.copy()
         c, k = solve2(H)
