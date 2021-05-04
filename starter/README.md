@@ -22,7 +22,7 @@ When writing inputs/outputs:
   - These are the functions run by the autograder to validate submissions
 
 
-To run the code:
+**TO RUN THE CODE:**
 - `cd` into the starter directory
 - To run folders, uncomment the INDIVIDUAL TESTER in `solver.py`
 	- Depending on which size of inputs you want to run, replace the `temp` on the `inputs` variable line with `small`, `medium` or `large`
