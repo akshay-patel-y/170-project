@@ -55,8 +55,6 @@ def solve(G):
                     G.remove_node(x[1])
                     if not nx.is_connected(G):
                         G = H
-                        #G.add_node(x[1])
-                       
                     else:
                         c.append(x[1])
                         changed = True
@@ -84,9 +82,6 @@ def solve(G):
                             changed = True
                             k_budg -= 1
                             break
-    # ideas:
-    # 1) edges first approach
-    # 2) somehow "looking ahead"??
     return c, k
 
 def solve2(G):
@@ -144,12 +139,10 @@ def solve2(G):
                 c_disjoint += 1
             if k_disjoint > k_budg and k_budg > 0:
                 break
-            if c_disjoint > c_budg and c_disjoint > 0:
+            if c_disjoint > c_budg and c_budg > 0:
                 break
             if i >= limit:
                 break
-            # if k_disjoint > k_budg or c_disjoint > c_budg or i >= limit:
-            #     break
             for edge in edge_inter:
                 if edge in edgeFreqs:
                     edgeFreqs[edge] += 1
@@ -162,16 +155,10 @@ def solve2(G):
                     nodeFreqs[node] += 1
                 else:
                     nodeFreqs[node] = 1
-            # if len(edge_inter) == 0 or len(node_inter) == 0 or i >= limit:
-            #     break
-            #common_edges = edge_inter
-            #common_nodes = node_inter
             i += 1
         if k_budg > 0:
             edges = list(edgeFreqs.keys())
             edges.sort(key=lambda x: edgeFreqs[x], reverse=True)
-            #edge_weights = list(common_edges)
-            #edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
             j = 0
             while not changed and j < len(edges):
                 edge = edges[j]
@@ -188,8 +175,6 @@ def solve2(G):
         elif c_budg > 0 and not changed:
             nodes = list(nodeFreqs.keys())
             nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
-            # node_degrees = list(G.degree(list(common_nodes)))
-            # node_degrees.sort(key=lambda x: x[1], reverse=True)
             j = 0
             while not changed and j < len(nodes):
                 H = G.copy()
@@ -207,19 +192,6 @@ def solve2(G):
                     changed = True
                     c_budg -= 1
                     break
-        # elif k_budg > 0:
-        #     edge_weights = list(common_edges)
-        #     edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
-        #     for edge in edge_weights:
-        #         weight = G.edges[edge[0], edge[1]]['weight']
-        #         G.remove_edge(edge[0], edge[1])
-        #         if not nx.is_connected(G):
-        #             G.add_edge(edge[0], edge[1], weight=weight)
-        #         else:
-        #             k.append((edge[0], edge[1]))
-        #             changed = True
-        #             k_budg -= 1
-        #             break
     # for large-101 edge case
     for node in c:
         for edge in k:
@@ -279,33 +251,33 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-if __name__ == '__main__':
-    assert len(sys.argv) == 2
-    path = sys.argv[1]
-    G = read_input_file(path)
-    H = G.copy()
-    c, k = solve2(H)
-    assert is_valid_solution(G, c, k)
-    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-    write_output_file(G, c, k, 'outputs/test.out')
+# Run for individual tests -- INDIVIDUAL TESTER --
 
+# if __name__ == '__main__':
+#     assert len(sys.argv) == 2
+#     path = sys.argv[1]
+#     G = read_input_file(path)
+#     H = G.copy()
+#     c, k = solve2(H)
+#     assert is_valid_solution(G, c, k)
+#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+#     write_output_file(G, c, k, 'outputs/large/large-161.out')
+
+
+# Run for folder tests -- FOLDER TESTER --
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
-# Brandon: 1-100
-# Instructional machine: 101-200
-# Akshay: 201-250
-# Cindy: 251-300
-# if __name__ == '__main__':
-#     inputs = glob.glob('inputs/inputs/temp/*')
-#     distances = []
-#     for input_path in inputs:
-#         output_path = 'outputs/L1-150/' + basename(normpath(input_path))[:-3] + '.out'
-#         G = read_input_file(input_path)
-#         H = G.copy()
-#         c, k = solve2(H)
-#         assert is_valid_solution(G, c, k)
-#         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
-#         write_output_file(G, c, k, output_path)
-    # with open('outputs/distances_medium_alg2.txt', "w") as fo:
-    #     for d in distances:
-    #         fo.write(d[0] + " " + str(d[1]) + "\n")
+if __name__ == '__main__':
+    inputs = glob.glob('inputs/inputs/temp/*')
+    distances = []
+    for input_path in inputs:
+        output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
+        G = read_input_file(input_path)
+        H = G.copy()
+        c, k = solve2(H)
+        assert is_valid_solution(G, c, k)
+        distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
+        write_output_file(G, c, k, output_path)
+    with open('outputs/distances_large.txt', "w") as fo:
+        for d in distances:
+            fo.write(d[0] + " " + str(d[1]) + "\n")
