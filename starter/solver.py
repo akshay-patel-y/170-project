@@ -146,7 +146,7 @@ def solve2(G):
                 c_disjoint += 1
             if k_disjoint >= k_budg and k_budg > 0:
                 break
-            if c_disjoint >= c_budg and c_disjoint > 0:
+            if c_disjoint >= c_budg and c_budg > 0:
                 break
             if i >= limit:
                 break
