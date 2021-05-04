@@ -4,6 +4,7 @@ from utils import is_valid_solution, calculate_score
 import sys
 from os.path import basename, normpath
 import glob
+import random
 
 
 def solve(G):
@@ -55,8 +56,6 @@ def solve(G):
                     G.remove_node(x[1])
                     if not nx.is_connected(G):
                         G = H
-                        #G.add_node(x[1])
-                       
                     else:
                         c.append(x[1])
                         changed = True
@@ -100,15 +99,18 @@ def solve2(G):
     """
     if len(G) <= 30:
         c_budg, k_budg = 1, 15
+        epsilon = 0.15
     elif len(G) <= 50:
         c_budg, k_budg = 3, 50
+        epsilon = 0.5
     else:
         c_budg, k_budg = 5, 100
+        epsilon = 0.75
 
     c = []
     k = []
-    # limit = 50
-    limit = k_budg
+    #limit = 50
+    limit = k_budg + c_budg
     target = G.number_of_nodes() - 1
     changed = True
     while c_budg > 0 or k_budg > 0:
@@ -142,9 +144,9 @@ def solve2(G):
                 k_disjoint += 1
             if len(node_inter) == 0:
                 c_disjoint += 1
-            if k_disjoint > k_budg and k_budg > 0:
+            if k_disjoint >= k_budg and k_budg > 0:
                 break
-            if c_disjoint > c_budg and c_disjoint > 0:
+            if c_disjoint >= c_budg and c_disjoint > 0:
                 break
             if i >= limit:
                 break
@@ -169,9 +171,15 @@ def solve2(G):
             i += 1
         if k_budg > 0:
             edges = list(edgeFreqs.keys())
-            edges.sort(key=lambda x: edgeFreqs[x], reverse=True)
-            #edge_weights = list(common_edges)
-            #edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
+            if max(edgeFreqs.values()) == 1:
+                edges.sort(key=lambda e: G.edges[e[0], e[1]]['weight'])
+            elif random.random() <= epsilon:
+                random.shuffle(edges)
+                epsilon /= 2
+            else:
+                edges.sort(key=lambda x: edgeFreqs[x], reverse=True)
+                #edge_weights = list(common_edges)
+                #edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
             j = 0
             while not changed and j < len(edges):
                 edge = edges[j]
@@ -187,7 +195,10 @@ def solve2(G):
                     break
         elif c_budg > 0 and not changed:
             nodes = list(nodeFreqs.keys())
-            nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
+            if nodeFreqs.values() and max(nodeFreqs.values()) == 1:
+                nodes.sort(key=lambda node: G.degree[node], reverse=True)
+            else:
+                nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
             # node_degrees = list(G.degree(list(common_nodes)))
             # node_degrees.sort(key=lambda x: x[1], reverse=True)
             j = 0
@@ -243,6 +254,7 @@ def solve2(G):
                             changed = True
                             k_budg -= 1
                             break
+
     return c, k
 
 def maxVertex(G, shortestPath):
@@ -279,15 +291,15 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
-if __name__ == '__main__':
-    assert len(sys.argv) == 2
-    path = sys.argv[1]
-    G = read_input_file(path)
-    H = G.copy()
-    c, k = solve2(H)
-    assert is_valid_solution(G, c, k)
-    print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-    write_output_file(G, c, k, 'outputs/test.out')
+# if __name__ == '__main__':
+#     assert len(sys.argv) == 2
+#     path = sys.argv[1]
+#     G = read_input_file(path)
+#     H = G.copy()
+#     c, k = solve2(H)
+#     assert is_valid_solution(G, c, k)
+#     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
+#     write_output_file(G, c, k, 'outputs/test.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
@@ -295,17 +307,17 @@ if __name__ == '__main__':
 # Instructional machine: 101-200
 # Akshay: 201-250
 # Cindy: 251-300
-# if __name__ == '__main__':
-#     inputs = glob.glob('inputs/inputs/temp/*')
-#     distances = []
-#     for input_path in inputs:
-#         output_path = 'outputs/L1-150/' + basename(normpath(input_path))[:-3] + '.out'
-#         G = read_input_file(input_path)
-#         H = G.copy()
-#         c, k = solve2(H)
-#         assert is_valid_solution(G, c, k)
-#         distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
-#         write_output_file(G, c, k, output_path)
+if __name__ == '__main__':
+    inputs = glob.glob('inputs/inputs/temp/*')
+    distances = []
+    for input_path in inputs:
+        output_path = 'outputs/large_3/' + basename(normpath(input_path))[:-3] + '.out'
+        G = read_input_file(input_path)
+        H = G.copy()
+        c, k = solve2(H)
+        assert is_valid_solution(G, c, k)
+        distances.append((basename(normpath(input_path))[:-3], calculate_score(G, c, k)))
+        write_output_file(G, c, k, output_path)
     # with open('outputs/distances_medium_alg2.txt', "w") as fo:
     #     for d in distances:
     #         fo.write(d[0] + " " + str(d[1]) + "\n")
