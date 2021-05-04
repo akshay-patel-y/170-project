@@ -7,9 +7,9 @@ if __name__ == '__main__':
     outputs_dir = sys.argv[1]
     submission_name = sys.argv[2]
     submission = {}
-    for folder in os.listdir("inputs"):
+    for folder in os.listdir("inputs/inputs/"):
         if not folder.startswith('.'):
-            for input_path in os.listdir("inputs/" + folder):
+            for input_path in os.listdir("inputs/inputs/" + folder):
                 graph_name = input_path.split('.')[0]
                 output_file = f'{outputs_dir}/{folder}/{graph_name}.out'
                 if os.path.exists(output_file) and validate_file(output_file):
