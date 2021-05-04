@@ -28,6 +28,7 @@ To run the code:
 	- Depending on which size of inputs you want to run, replace the `temp` on the `inputs` variable line with `small`, `medium` or `large`
 	- Run `python3 solver.py` in the terminal
 - To run individual files, uncomment the FOLDER TESTER in `solver.py`
+	-To change the location of the output file, change `test.out` to desired file name + .out
 	- Run `python3 solver.py inputs/inputs/{desidered size of graph}/{graph name}` in the terminal (ex: `python3 solver.py inputs/inputs/small/small-126.in` to run the small-126 graph)
-- To run on the first solver, change the call to `solve2(H)` in `solver.py` to `solve(H)`.
-- To run on different "breaking points"/limit to how many shortest paths to generate for solver2, in `solver.py`, `solver2` function, uncomment/comment/change the `limit` variable.
+- To run on the first solver, change the call to `solve2(H)` in `solver.py` to `solve(H)`
+- To run on different "breaking points"/limit to how many shortest paths to generate for solver2, in `solver.py`, `solver2` function, uncomment/comment/change the `limit` variable

@@ -4,6 +4,7 @@ from utils import is_valid_solution, calculate_score
 import sys
 from os.path import basename, normpath
 import glob
+import random
 
 
 def solve(G):
@@ -95,15 +96,18 @@ def solve2(G):
     """
     if len(G) <= 30:
         c_budg, k_budg = 1, 15
+        epsilon = 0.15
     elif len(G) <= 50:
         c_budg, k_budg = 3, 50
+        epsilon = 0.5
     else:
         c_budg, k_budg = 5, 100
+        epsilon = 0.75
 
     c = []
     k = []
-    # limit = 50
-    limit = k_budg
+    #limit = 50
+    limit = k_budg + c_budg
     target = G.number_of_nodes() - 1
     changed = True
     while c_budg > 0 or k_budg > 0:
@@ -137,9 +141,9 @@ def solve2(G):
                 k_disjoint += 1
             if len(node_inter) == 0:
                 c_disjoint += 1
-            if k_disjoint > k_budg and k_budg > 0:
+            if k_disjoint >= k_budg and k_budg > 0:
                 break
-            if c_disjoint > c_budg and c_budg > 0:
+            if c_disjoint >= c_budg and c_budg > 0:
                 break
             if i >= limit:
                 break
@@ -158,7 +162,15 @@ def solve2(G):
             i += 1
         if k_budg > 0:
             edges = list(edgeFreqs.keys())
-            edges.sort(key=lambda x: edgeFreqs[x], reverse=True)
+            if max(edgeFreqs.values()) == 1:
+                edges.sort(key=lambda e: G.edges[e[0], e[1]]['weight'])
+            elif random.random() <= epsilon:
+                random.shuffle(edges)
+                epsilon /= 2
+            else:
+                edges.sort(key=lambda x: edgeFreqs[x], reverse=True)
+                #edge_weights = list(common_edges)
+                #edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
             j = 0
             while not changed and j < len(edges):
                 edge = edges[j]
@@ -174,7 +186,10 @@ def solve2(G):
                     break
         elif c_budg > 0 and not changed:
             nodes = list(nodeFreqs.keys())
-            nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
+            if nodeFreqs.values() and max(nodeFreqs.values()) == 1:
+                nodes.sort(key=lambda node: G.degree[node], reverse=True)
+            else:
+                nodes.sort(key=lambda x: nodeFreqs[x], reverse=True)
             j = 0
             while not changed and j < len(nodes):
                 H = G.copy()
@@ -215,6 +230,7 @@ def solve2(G):
                             changed = True
                             k_budg -= 1
                             break
+
     return c, k
 
 def maxVertex(G, shortestPath):
@@ -251,6 +267,7 @@ def vitality(G, x):
 
 # Usage: python3 solver.py test.in
 
+# -----------------------------
 # Run for individual tests -- INDIVIDUAL TESTER --
 
 # if __name__ == '__main__':
@@ -261,9 +278,10 @@ def vitality(G, x):
 #     c, k = solve2(H)
 #     assert is_valid_solution(G, c, k)
 #     print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-#     write_output_file(G, c, k, 'outputs/large/large-161.out')
+#     write_output_file(G, c, k, 'outputs/test.out')
+# -----------------------------
 
-
+# -----------------------------
 # Run for folder tests -- FOLDER TESTER --
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
@@ -281,3 +299,4 @@ if __name__ == '__main__':
     with open('outputs/distances_large.txt', "w") as fo:
         for d in distances:
             fo.write(d[0] + " " + str(d[1]) + "\n")
+# -----------------------------
