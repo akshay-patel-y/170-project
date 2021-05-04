@@ -169,8 +169,6 @@ def solve2(G):
                 epsilon /= 2
             else:
                 edges.sort(key=lambda x: edgeFreqs[x], reverse=True)
-                #edge_weights = list(common_edges)
-                #edge_weights.sort(key=lambda x: G.edges[x[0], x[1]]['weight'])
             j = 0
             while not changed and j < len(edges):
                 edge = edges[j]
